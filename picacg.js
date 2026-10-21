@@ -590,30 +590,9 @@ class Picacg extends ComicSource {
                     throw 'Invalid status code: ' + res.status
                 }
                 let data = JSON.parse(res.body)
-                data.data.comic["coverUrl"]= data.data.thumb.fileServer + '/static/' + data.data.thumb.path
-                // let info =data.data.comic
-                // let coverUrl = info.thumb.fileServer + '/static/' + info.thumb.path
-                // // 检测封面 URL 是否可访问  
-                // try {
-                //     let coverRes = await Network.get(coverUrl, this.buildHeaders('GET', '', this.loadData('token')))
-                //     data.data.comic["coverReachable"]=true
-                //     if (coverRes.status !== 200) {
-                //         throw 'Cover not accessible: ' + coverRes.status
-                //     }
-                // } catch (e) {
-                //     // 使用本地图片资源代替；file:// 前缀由 CachedImageProvider 识别为本地文件路径  
-                //     if (APP.platform === 'windows') {
-                //         coverUrl = 'http://localhost:80/comic.jpg';
-                //         // coverUrl = 'file://D:/Venera/comic.png' // 应该是可以的，不知道为什么不行
-                //     } else if (APP.platform === 'android') {
-                //         coverUrl = 'file:///storage/emulated/0/Pictures/venera_placeholder.jpg';
-                //     } else {
-                //         coverUrl = 'file:///path/to/placeholder.png';
-                //     }  
-                //     data.data.comic["coverReachable"]=false
-                //     data.data.comic["coverUrl"]=coverUrl
-                // }
-                return data.data.comic
+                let comicInfo =  data.data.comic
+                comicInfo["coverUrl"]= comicInfo.thumb.fileServer + '/static/' + data.data.thumb.path
+                return comicInfo
             }
             let epsLoader = async () => {
                 let eps = new Map();
