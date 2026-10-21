@@ -1,3 +1,6 @@
+// 地址
+https://cdn.jsdelivr.net/gh/MightZhang/venera-configs@latest/index.json
+
 //禁漫，跳过加载广告
 {'all':{ 'enable': false , 'headf': 0, 'endf':  0 },
 '286368': { 'enable': true, 'headf': 0, 'endf': 1 },
