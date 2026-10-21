@@ -1100,7 +1100,16 @@ class JM extends ComicSource {
             title: "忽略配置",
             type: "input",
             validator: null,
-            default: '{"all":{ "enable": false , "headf": 0, "endf":  0 },"286368": { "enable": true, "headf": 0, "endf": 1 }}',
+            default: `
+{"all":{ "enable": false , "headf": 0, "endf":  0 },
+"286368": { "enable": true, "headf": 0, "endf": 1 },
+"569509": { "enable": true, "headf": 0, "endf": 1 },
+"1020473": { "enable": true, "headf": 0, "endf": 1 },
+"1136963": { "enable": true, "headf": 0, "endf": 1 },
+"1478522": { "enable": true, "headf": 0, "endf": 1 },
+"1478521": { "enable": true, "headf": 0, "endf": 1 },
+"1175106": { "enable": true, "headf": 0, "endf": 1 },
+"1216570": { "enable": true, "headf": 0, "endf": 1 }}`,
         },
     }
 
