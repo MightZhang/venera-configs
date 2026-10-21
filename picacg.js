@@ -591,7 +591,7 @@ class Picacg extends ComicSource {
                 }
                 let data = JSON.parse(res.body)
                 let comicInfo =  data.data.comic
-                comicInfo["coverUrl"]= comicInfo.thumb.fileServer + '/static/' + data.data.thumb.path
+                comicInfo["coverUrl"]= comicInfo.thumb.fileServer + '/static/' + comicInfo.thumb.path
                 return comicInfo
             }
             let epsLoader = async () => {
