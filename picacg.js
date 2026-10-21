@@ -266,7 +266,13 @@ class Picacg extends ComicSource {
     category = {
         /// 标题, 同时为标识符, 不能与其他漫画源的分类页面重复
         title: "Picacg",
-        parts: [
+        parts: [   
+            {
+                name: "标签",
+                type: "fixed",
+                categories: ["無修正","CG","AI作畫"],
+                itemType: "search",
+            },
             {
                 name: "主题",
                 type: "fixed",
@@ -317,10 +323,17 @@ class Picacg extends ComicSource {
         ],
         enableRankingPage: true,
     }
-
+    lastClickCategory=""
     /// 分类漫画页面, 即点击分类标签后进入的页面
     categoryComics = {
         load: async (category, param, options, page) => {
+            let showAiGenFlag = "";
+            if(options[0]==='ai'||options[0]==='noai'){
+                showAiGenFlag =options[0];
+                options[0] =  this.lastClickCategory 
+            }else{
+                this.lastClickCategory = options[0] ;
+            }
             let type = param ?? 'c'
             let res = await Network.get(
                 `${this.loadSetting('base_url')}/comics?page=${page}&${type}=${encodeURIComponent(category)}&s=${options[0]}`,
@@ -338,8 +351,19 @@ class Picacg extends ComicSource {
             }
             let data = JSON.parse(res.body)
             let comics = []
+            const re = /[（(]AI[）)]/g;
             data.data.comics.docs.forEach(c => {
-                comics.push(this.parseComic(c))
+                let comic = this.parseComic(c);
+                if(showAiGenFlag===''){
+                    comics.push(comic)
+                }
+                if(showAiGenFlag==='ai'&&(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                    comics.push(comic)
+                }
+                if(showAiGenFlag==='noai'&&!(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                    comics.push(comic)
+                }
+                
             })
             return {
                 comics: comics,
@@ -354,6 +378,8 @@ class Picacg extends ComicSource {
                     "da-Old to new",
                     "ld-Most likes",
                     "vd-Most nominated",
+                    "ai-AI Generate",
+                    "noai-None AI Generate",
                 ],
             }
         ],
@@ -391,9 +417,62 @@ class Picacg extends ComicSource {
         }
     }
 
+    lastSerchAICategory = ""
     /// 搜索
     search = {
         load: async (keyword, options, page) => {
+            let showAiGenFlag = "";
+            if(options[0]==='ai'||options[0]==='noai'){
+                showAiGenFlag =options[0];
+                options[0] =  this.lastSerchAICategory 
+            }else{
+                this.lastSerchAICategory = options[0] ;
+            }
+
+            if (keyword.startsWith('根据文件夹名称获取json:') ) {
+                const jsonStr = keyword.substring('根据文件夹名称获取json:'.length).trim();
+                const ids = JSON.parse(jsonStr);
+                if (Array.isArray(ids)) {
+                    console.warn('获取参数ids：'+JSON.stringify(ids));
+                }
+                // 异步加载函数（箭头函数会自动继承外部的 this，无需 _this）
+                const infoLoader = async (id) => {
+                    try {
+                        let url = `${this.loadSetting('base_url')}/comics/${id}`
+                        const res = await Network.get(
+                            url,
+                            this.buildHeaders('GET', `comics/${id}`, this.loadData('token'))
+                        );
+
+                        if (res.status !== 200) {
+                            return { infoLoaderState: "fail", ...res };
+                        }
+
+                        // 安全解析 JSON
+                        const data = JSON.parse(res.body);
+                        return data.data.comic;
+                    } catch (error) {
+                        console.error(`请求或解析失败，ID: ${id}`, error);
+                        return { infoLoaderState: "fail", error: error.message };
+                    }
+                };
+
+                let getAsync = async (list) => {
+                    let successArr = []
+                    let failArr = []
+
+                    for (const item of list) {
+                        const fileInfo = await infoLoader(item);
+                        if('fail'===fileInfo.infoLoaderState){
+                            failArr.push(item)
+                        }else{
+                            successArr.push(fileInfo)
+                        }
+                    }
+                }
+                getAsync(ids)
+            }
+
             let res = await Network.post(
                 `${this.loadSetting('base_url')}/comics/advanced-search?page=${page}`,
                 this.buildHeaders('POST', `comics/advanced-search?page=${page}`, this.loadData('token')),
@@ -418,9 +497,23 @@ class Picacg extends ComicSource {
             }
             let data = JSON.parse(res.body)
             let comics = []
+            const re = /[（(]AI[）)]/g;
             data.data.comics.docs.forEach(c => {
-                comics.push(this.parseComic(c))
+                let comic = this.parseComic(c);
+                if(showAiGenFlag===''){
+                    comics.push(comic)
+                }
+                if(showAiGenFlag==='ai'&&(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                    comics.push(comic)
+                }
+                if(showAiGenFlag==='noai'&&!(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                    comics.push(comic)
+                }
+                
             })
+            // data.data.comics.docs.forEach(c => {
+            //     comics.push(this.parseComic(c))
+            // })
             return {
                 comics: comics,
                 maxPage: data.data.comics.pages
@@ -433,6 +526,8 @@ class Picacg extends ComicSource {
                     "da-Old to new",
                     "ld-Most likes",
                     "vd-Most nominated",
+                    "ai-AI Generate",
+                    "noai-None AI Generate",
                 ],
                 label: "Sort"
             }
@@ -495,6 +590,29 @@ class Picacg extends ComicSource {
                     throw 'Invalid status code: ' + res.status
                 }
                 let data = JSON.parse(res.body)
+                data.data.comic["coverUrl"]= data.data.thumb.fileServer + '/static/' + data.data.thumb.path
+                // let info =data.data.comic
+                // let coverUrl = info.thumb.fileServer + '/static/' + info.thumb.path
+                // // 检测封面 URL 是否可访问  
+                // try {
+                //     let coverRes = await Network.get(coverUrl, this.buildHeaders('GET', '', this.loadData('token')))
+                //     data.data.comic["coverReachable"]=true
+                //     if (coverRes.status !== 200) {
+                //         throw 'Cover not accessible: ' + coverRes.status
+                //     }
+                // } catch (e) {
+                //     // 使用本地图片资源代替；file:// 前缀由 CachedImageProvider 识别为本地文件路径  
+                //     if (APP.platform === 'windows') {
+                //         coverUrl = 'http://localhost:80/comic.jpg';
+                //         // coverUrl = 'file://D:/Venera/comic.png' // 应该是可以的，不知道为什么不行
+                //     } else if (APP.platform === 'android') {
+                //         coverUrl = 'file:///storage/emulated/0/Pictures/venera_placeholder.jpg';
+                //     } else {
+                //         coverUrl = 'file:///path/to/placeholder.png';
+                //     }  
+                //     data.data.comic["coverReachable"]=false
+                //     data.data.comic["coverUrl"]=coverUrl
+                // }
                 return data.data.comic
             }
             let epsLoader = async () => {
@@ -507,6 +625,7 @@ class Picacg extends ComicSource {
                         `${this.loadSetting('base_url')}/comics/${id}/eps?page=${i}`,
                         this.buildHeaders('GET', `comics/${id}/eps?page=${i}`, this.loadData('token'))
                     );
+
                     if (res.status !== 200) {
                         throw 'Invalid status code: ' + res.status;
                     }
@@ -525,23 +644,31 @@ class Picacg extends ComicSource {
                 return eps;
             }
             let relatedLoader = async () => {
-                let res = await Network.get(
-                    `${this.loadSetting('base_url')}/comics/${id}/recommendation`,
-                    this.buildHeaders('GET', `comics/${id}/recommendation`, this.loadData('token'))
-                )
-                if (res.status !== 200) {
-                    throw 'Invalid status code: ' + res.status
-                }
-                let data = JSON.parse(res.body)
-                let comics = []
-                data.data.comics.forEach(c => {
-                    comics.push(this.parseComic(c))
-                })
-                return comics
+                 return []
             }
+            if(this.loadSetting('enableShowRecommend')){
+                relatedLoader = async () => {
+                    let res = await Network.get(
+                        `${this.loadSetting('base_url')}/comics/${id}/recommendation`,
+                        this.buildHeaders('GET', `comics/${id}/recommendation`, this.loadData('token'))
+                    )
+                    if (res.status !== 200) {
+                        throw 'Invalid status code: ' + res.status
+                    }
+                    let data = JSON.parse(res.body)
+
+                    let comics = []
+                    data.data.comics.forEach(c => {
+                        comics.push(this.parseComic(c))
+                    })
+                    return comics
+                }
+            }
+            
             let info, eps, related
             try {
                 [info, eps, related] = await Promise.all([infoLoader(), epsLoader(), relatedLoader()])
+           
             }
             catch (e) {
                 if (e === 'Invalid status code: 401') {
@@ -561,7 +688,7 @@ class Picacg extends ComicSource {
             let formattedDate = updateTime.getFullYear() + '-' + (updateTime.getMonth() + 1) + '-' + updateTime.getDate()
             return new ComicDetails({
                 title: info.title,
-                cover: info.thumb.fileServer + '/static/' + info.thumb.path,
+                cover: info.coverUrl,
                 description: info.description,
                 tags: {
                     ...tags,
@@ -588,6 +715,7 @@ class Picacg extends ComicSource {
                     `${this.loadSetting('base_url')}/comics/${comicId}/order/${epId}/pages?page=${i}`,
                     this.buildHeaders('GET', `comics/${comicId}/order/${epId}/pages?page=${i}`, this.loadData('token'))
                 )
+
                 if (res.status !== 200) {
                     throw 'Invalid status code: ' + res.status
                 }
@@ -600,6 +728,7 @@ class Picacg extends ComicSource {
                 }
                 i++
             }
+
             return {
                 images: images
             }
@@ -794,6 +923,11 @@ class Picacg extends ComicSource {
                 },
             ],
             default: 'dd',
+        },
+        'enableShowRecommend': {
+            type: 'switch',
+            title: '展示推荐栏',
+            default: false,
         }
     }
 
@@ -819,6 +953,8 @@ class Picacg extends ComicSource {
             'App channel': "分流",
             'Favorite sort': "收藏排序",
             'Sort': "排序",
+            "AI Generate": "AI作画",
+            "None AI Generate":"非AI作画",
         },
         'zh_TW': {
             'Picacg Random': "哔咔隨機",
@@ -841,6 +977,8 @@ class Picacg extends ComicSource {
             'App channel': "分流",
             'Favorite sort': "收藏排序",
             'Sort': "排序",
+            "AI Generate": "AI作画",
+            "None AI Generate":"非AI作画",
         },
     }
 }

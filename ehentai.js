@@ -673,12 +673,14 @@ class Ehentai extends ComicSource {
          * @returns {Promise<ComicDetails>}
          */
         loadInfo: async (id) => {
+
             try {
                 this.checkEHEvent();
             } catch (_) {}
             let res = await Network.get(id, {
                 'cookie': 'nw=1'
             });
+
             if (res.status !== 200) {
                 throw `Invalid status code: ${res.status}`
             }
@@ -795,13 +797,16 @@ class Ehentai extends ComicSource {
             comic.folder = folder
             comic.token = variables.get("token")
             this.apikey = variables.get("apikey")
+            console.warn("=======loadInfo=====comic.token==\n"+JSON.stringify(comic.token));
+            console.warn("=======loadInfo=====  this.apikey ==\n"+JSON.stringify(  this.apikey ));
+
             if(this.apikey[0] === '"') {
                 this.apikey = this.apikey.substring(1, this.apikey.length - 1)
             }
             this.uid = variables.get("apiuid")
 
             document.dispose()
-
+            console.warn("=======loadInfo=====comic===\n"+JSON.stringify(comic))
             return comic;
         },
         /**
@@ -812,6 +817,7 @@ class Ehentai extends ComicSource {
          */
         loadThumbnails: async (id, next) => {
             let url = id
+
             if(next != null) {
                 url += `?p=${next}`
             }
@@ -820,6 +826,7 @@ class Ehentai extends ComicSource {
                 'prevent-parallel': 'true',
                 'cookie': 'nw=1'
             });
+
             if(res.status !== 200) {
                 throw `Invalid status code: ${res.status}`
             }
@@ -856,6 +863,7 @@ class Ehentai extends ComicSource {
                     images.push(parseImageUrl(e))
                 }
             }
+
             let urls = document.querySelectorAll("table.ptb > tbody > tr > td > a").map((e) => e.attributes["href"])
             let pageNumbers = urls.map((e) => {
                 let n = Number(e.split("=")[1])
@@ -864,6 +872,7 @@ class Ehentai extends ComicSource {
                 }
                 return n
             })
+
             let maxPage = Math.max(...pageNumbers)
             let current = 0
             if(next) {
@@ -877,6 +886,9 @@ class Ehentai extends ComicSource {
             }
             let _urls = document.querySelectorAll("div#gdt a").map((e) => e.attributes["href"])
             document.dispose()
+
+
+            
             return {
                 thumbnails: images,
                 urls: _urls,
@@ -941,8 +953,9 @@ class Ehentai extends ComicSource {
          */
         loadEp: async (comicId, epId) => {
             let comic = await this.comic.loadInfo(comicId)
+            let images = Array.from({length: comic.maxPage}, (_, i) => i.toString());
             return {
-                images: Array.from({length: comic.maxPage}, (_, i) => i.toString())
+                images: images
             }
         },
         /**
@@ -954,7 +967,9 @@ class Ehentai extends ComicSource {
          * @returns {{}}
          */
         onImageLoad: async (image, comicId, epId, nl) => {
+
             let first = await this.comic.loadThumbnails(comicId)
+
             let key = await this.comic.getKey(first.urls[0])
             let page = Number(image)
 
@@ -1039,6 +1054,7 @@ class Ehentai extends ComicSource {
          * @returns {{}}
          */
         onThumbnailLoad: (url) => {
+
             if(url.includes('s.exhentai.org')) {
                 url = url.replace("s.exhentai.org", "ehgt.org")
             }

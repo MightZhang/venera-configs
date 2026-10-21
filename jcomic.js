@@ -446,14 +446,48 @@ class JComic extends ComicSource {
         path += "/" + encodeURIComponent(epId);
       }
       const url = JCOMIC_BASE + path;
+      
+      // 纯JS base64解码，替代 atob()
+      function base64Decode(base64Str) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+        let output = '';
+        // 移除末尾填充=
+        base64Str = base64Str.replace(/[=]+$/, '');
+        for (let i = 0; i < base64Str.length; i += 4) {
+          const c1 = chars.indexOf(base64Str[i]);
+          const c2 = chars.indexOf(base64Str[i + 1]);
+          const c3 = chars.indexOf(base64Str[i + 2]);
+          const c4 = chars.indexOf(base64Str[i + 3]);
+          const bits = (c1 << 18) | (c2 << 12) | (c3 << 6) | c4;
+          output += String.fromCharCode((bits >> 16) & 0xff);
+          if (i + 2 < base64Str.length) {
+            output += String.fromCharCode((bits >> 8) & 0xff);
+          }
+          if (i + 3 < base64Str.length) {
+            output += String.fromCharCode(bits & 0xff);
+          }
+        }
+        return output;
+      }
 
+      // -----你的原有代码改造-----
+     
       const resp = await Network.get(url, { referer: JCOMIC_REFERER });
+
       if (resp.status !== 200) throw new Error(resp.status);
 
-      const doc = new HtmlDocument(resp.body);
-      const imgs = doc.querySelectorAll("img.comic-thumb");
-      const images = Array.from(imgs).map((img) => img.attributes["src"]);
+      const htmlFragment = resp.body;
 
+      // 正则捕获 data‑locked 里面 JCOMIC_TRAPS_ 之后的全部内容
+      const reg = /data-locked="JCOMIC_TRAPS_([^"]+)"/g;
+      const images = [];
+      let m;
+      // exec 循环读取捕获组
+      while ((m = reg.exec(htmlFragment)) !== null) {
+        // m[1] 就是下划线后面那串，例如 aaa111
+        images.push( base64Decode(m[1].split('').reverse().join('')));
+      }
+      console.warn("=====loadEp===images==="+JSON.stringify(images))
       return { images };
     },
 

@@ -1003,6 +1003,8 @@ class Hitomi extends ComicSource {
   url = "https://cdn.jsdelivr.net/gh/venera-app/venera-configs@main/hitomi.js";
 
   galleryCache = [];
+  imagesCache = [];
+
   categoryResultCache = undefined;
   searchResultCaches = new Map();
 
@@ -1475,10 +1477,24 @@ class Hitomi extends ComicSource {
       }
 
       this.galleryCache = data;
-
+      let images = await get_image_srcs(data.files);
+      images = images.map(url => {
+        // ★ 核心：AVIF URL → WebP URL
+        if (url.includes('.avif')) {
+          url = url.replace(/\.avif$/, '.webp');
+        }
+        if (url.includes('https://a')) {
+          url = url.replaceAll('https://a', 'https://w');
+        }
+        return url
+      })
+      let coverUrl=images[0]?images[0] : get_thumbnail_url_from_hash(data.thumbnail_hash, true)
+      this.imagesCache = images
+      // console.warn("====loadInfo== images===\n"+ JSON.stringify( images))
+      
       return new ComicDetails({
         title: data.title,
-        cover: get_thumbnail_url_from_hash(data.thumbnail_hash, true),
+        cover: coverUrl,
         tags,
         maxPage: data.files.length,
         thumbnails: data.files.map((n) => get_thumbnail_url_from_hash(n.hash)),
@@ -1496,7 +1512,7 @@ class Hitomi extends ComicSource {
     loadEp: async (comicId, epId) => {
       const data = this.galleryCache;
       if (data.type === "anime") throw new Error("不支持视频浏览");
-      const images = await get_image_srcs(data.files);
+      const images = this.imagesCache;
       return { images };
     },
     /**
@@ -1507,11 +1523,12 @@ class Hitomi extends ComicSource {
      * @returns {ImageLoadingConfig | Promise<ImageLoadingConfig>}
      */
     onImageLoad: (url, comicId, epId) => {
+      
       return {
         url,
         headers: {
           referer: refererUrl,
-        },
+        }
       };
     },
     /**

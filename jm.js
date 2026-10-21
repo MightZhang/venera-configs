@@ -787,13 +787,16 @@ class JM extends ComicSource {
                 chapters.set(id, '第1話')
             }
             let tags = data.tags ?? []
-            let related = data["related_list"].map((e) => new Comic({
-                id: e.id.toString(),
-                title: e.name,
-                subtitle: e.author ?? "",
-                cover: this.getCoverUrl(e.id),
-                description: e.description ?? ""
-            }))
+            let related = []
+            if(this.loadSetting('enableShowRecommend')){
+                related = data["related_list"].map((e) => new Comic({
+                    id: e.id.toString(),
+                    title: e.name,
+                    subtitle: e.author ?? "",
+                    cover: this.getCoverUrl(e.id),
+                    description: e.description ?? ""
+                }))
+            }
             let updateTimeStamp = data["addtime"];
             let date = new Date(updateTimeStamp * 1000)
             let updateDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -827,6 +830,22 @@ class JM extends ComicSource {
             let res = await this.get(`${this.baseUrl}/chapter?id=${epId}`);
             let data = JSON.parse(res)
             let images = data.images.map((e) => this.getImageUrl(epId, e))
+
+            let listJson = this.loadSetting('ignoreAdImageList');
+            let fSet = JSON.parse(listJson) ;
+            fSet['all'].enable=this.loadSetting('ignoreAdImage');
+            // {
+            //     'all':{ enable: this.loadSetting('ignoreAdImage') , headf: 0, endf:  0 },
+            //     286368: { enable: true, headf: 0, endf: 1 },
+            //     569509: { enable: true, headf: 0, endf: 1 },
+            //     1020473: { enable: true, headf: 0, endf: 1 },
+            //     1136963: { enable: true, headf: 0, endf: 1 },
+            //     1478522: { enable: true, headf: 0, endf: 1 },
+            // }
+            let length = images.length
+            if (fSet['all'].enable&&length > 0 && fSet[comicId] && fSet[comicId].enable) {
+                images = images.slice(fSet[comicId].headf, length - fSet[comicId].endf)
+            }
             return {
                 images: images
             }
@@ -991,6 +1010,7 @@ class JM extends ComicSource {
     ```
      */
     settings = {
+        
         refreshDomains: {
             title: "Refresh Domain List",
             type: "callback",
@@ -1065,6 +1085,22 @@ class JM extends ComicSource {
             type: "callback",
             buttonText: "Check-In",
             callback: () => this.dailyCheckIn()
+        },
+        'enableShowRecommend':{
+            title: "展示推荐栏",
+            type: "switch",
+            default: false
+        },
+        'ignoreAdImage':{
+            title: "忽略广告内容",
+            type: "switch",
+            default: false
+        },
+        'ignoreAdImageList': {
+            title: "忽略配置",
+            type: "input",
+            validator: null,
+            default: '{"all":{ "enable": false , "headf": 0, "endf":  0 },"286368": { "enable": true, "headf": 0, "endf": 1 }}',
         },
     }
 

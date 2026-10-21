@@ -1,0 +1,120 @@
+//禁漫，跳过加载广告
+{'all':{ 'enable': false , 'headf': 0, 'endf':  0 },
+'286368': { 'enable': true, 'headf': 0, 'endf': 1 },
+'569509': { 'enable': true, 'headf': 0, 'endf': 1 },
+'1020473': { 'enable': true, 'headf': 0, 'endf': 1 },
+'1136963': { 'enable': true, 'headf': 0, 'endf': 1 },
+'1478522': { 'enable': true, 'headf': 0, 'endf': 1 },
+'1478521': { 'enable': true, 'headf': 0, 'endf': 1 },
+'1175106': { 'enable': true, 'headf': 0, 'endf': 1 },
+'1216570': { 'enable': true, 'headf': 0, 'endf': 1 }}
+
+let fSet = {
+    286368: { enable: true, headf: 0, endf: 1 },
+    569509: { enable: true, headf: 0, endf: 1 },
+    1020473: { enable: true, headf: 0, endf: 1 },
+}
+console.warn(comicId)
+let length =images.length
+if (length > 0 && fSet[comicId] && fSet[comicId].enable) {
+    console.warn("removed some images:" + comicId)
+    images = images.slice(fSet[comicId].headf, length - fSet[comicId].endf)
+
+}
+//禁漫，跳过加载广告，配置跳过
+
+let listJson = this.loadSetting('ignoreAdImageList');
+            let fSet = JSON.parse(listJson) ;
+            fSet['all'].enable=this.loadSetting('ignoreAdImage');
+
+
+            
+,
+        'ignoreAdImage':{
+            title: "忽略广告内容",
+            type: "switch",
+            default: false
+        },
+        'ignoreAdImageList': {
+            title: "忽略配置",
+            type: "input",
+            validator: null,
+            default: '{"all":{ "enable": false , "headf": 0, "endf":  0 },"286368": { "enable": true, "headf": 0, "endf": 1 }}',
+        },
+
+// picacg配置搜索标签
+{
+    name: "标签",
+    type: "fixed",
+    categories: ["無修正", "CG"],
+    itemType: "search",
+}
+
+// 配置开启关联推荐栏
+
+'enableShowRecommend': {
+    title: "展示推荐栏",
+    type: "switch",
+    default: true
+},
+
+let relatedLoader = async () => {
+    return []
+}
+if (this.loadSetting('enableShowRecommend')) {
+    relatedLoader = async () => {
+        // 原逻辑
+    }
+}
+
+// AI作画过滤
+lastClickCategory="" // 全局变量，保存上次搜索的关键字
+ // ... 原代码
+let showAiGenFlag = "";
+            if(options[0]==='ai'||options[0]==='noai'){
+                showAiGenFlag =options[0];
+                options[0] =  this.lastClickCategory 
+            }else{
+                this.lastClickCategory = options[0] ;
+            }
+
+            // ... 原代码
+
+            const re = /[（(]AI[）)]/g;
+            data.data.comics.docs.forEach(c => {
+                let comic = this.parseComic(c);
+                if(showAiGenFlag===''){
+                    comics.push(comic)
+                }
+                if(showAiGenFlag==='ai'&&(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                    comics.push(comic)
+                }
+                if(showAiGenFlag==='noai'&&!(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                    comics.push(comic)
+                }
+                
+            })
+ optionList: [
+            {
+                options: [
+                    "dd-New to old",
+                    "da-Old to new",
+                    "ld-Most likes",
+                    "vd-Most nominated",
+                    "ai-AI Generate",
+                    "noai-None AI Generate",
+                ],
+            }
+        ],
+
+
+translation = {
+    'zh_CN': {
+    "AI Generate": "AI作画",
+    "None AI Generate": "非AI作画",
+    },
+    'zh_TW': {
+    "AI Generate": "AI作画",
+    "None AI Generate": "非AI作画",
+    },
+}
