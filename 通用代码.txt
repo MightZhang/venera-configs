@@ -1,16 +1,20 @@
-// 地址
+// 漫画源地址，main分支
+https://cdn.jsdelivr.net/gh/venera-app/venera-configs@latest/index.json
+// 自己修改的main
 https://cdn.jsdelivr.net/gh/MightZhang/venera-configs@latest/index.json
+// dev分支
+https://cdn.jsdelivr.net/gh/MightZhang/venera-configs@dev/index.json
 
 //禁漫，跳过加载广告
-{'all':{ 'enable': false , 'headf': 0, 'endf':  0 },
-'286368': { 'enable': true, 'headf': 0, 'endf': 1 },
-'569509': { 'enable': true, 'headf': 0, 'endf': 1 },
-'1020473': { 'enable': true, 'headf': 0, 'endf': 1 },
-'1136963': { 'enable': true, 'headf': 0, 'endf': 1 },
-'1478522': { 'enable': true, 'headf': 0, 'endf': 1 },
-'1478521': { 'enable': true, 'headf': 0, 'endf': 1 },
-'1175106': { 'enable': true, 'headf': 0, 'endf': 1 },
-'1216570': { 'enable': true, 'headf': 0, 'endf': 1 }}
+{"all":{ "enable": false , "headf": 0, "endf":  0 },
+"286368": { "enable": true, "headf": 0, "endf": 1 },
+"569509": { "enable": true, "headf": 0, "endf": 1 },
+"1020473": { "enable": true, "headf": 0, "endf": 1 },
+"1136963": { "enable": true, "headf": 0, "endf": 1 },
+"1478522": { "enable": true, "headf": 0, "endf": 1 },
+"1478521": { "enable": true, "headf": 0, "endf": 1 },
+"1175106": { "enable": true, "headf": 0, "endf": 1 },
+"1216570": { "enable": true, "headf": 0, "endf": 1 }}
 
 let fSet = {
     286368: { enable: true, headf: 0, endf: 1 },
