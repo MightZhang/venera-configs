@@ -27,6 +27,20 @@ class JM extends ComicSource {
         "www.cdnntr.cc",
     ];
 
+    ignoreObj =
+{
+"286368": { "enable": true, "headf": 0, "endf": 1 },
+"569509": { "enable": true, "headf": 0, "endf": 1 },
+"1020473": { "enable": true, "headf": 0, "endf": 1 },
+"1136963": { "enable": true, "headf": 0, "endf": 1 },
+"1478522": { "enable": true, "headf": 0, "endf": 1 },
+"1478521": { "enable": true, "headf": 0, "endf": 1 },
+"1175106": { "enable": true, "headf": 0, "endf": 1 },
+"1216570": { "enable": true, "headf": 0, "endf": 1 },
+"all":{ "enable": false , "headf": 0, "endf":  0 }}
+ 
+
+
     static imageUrl = "https://cdn-msp.jmapinodeudzn.net"
 
     static ua = "Mozilla/5.0 (Linux; Android 10; K; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/130.0.0.0 Mobile Safari/537.36"
@@ -1100,16 +1114,7 @@ class JM extends ComicSource {
             title: "忽略配置",
             type: "input",
             validator: null,
-            default: `
-{"all":{ "enable": false , "headf": 0, "endf":  0 },
-"286368": { "enable": true, "headf": 0, "endf": 1 },
-"569509": { "enable": true, "headf": 0, "endf": 1 },
-"1020473": { "enable": true, "headf": 0, "endf": 1 },
-"1136963": { "enable": true, "headf": 0, "endf": 1 },
-"1478522": { "enable": true, "headf": 0, "endf": 1 },
-"1478521": { "enable": true, "headf": 0, "endf": 1 },
-"1175106": { "enable": true, "headf": 0, "endf": 1 },
-"1216570": { "enable": true, "headf": 0, "endf": 1 }}`,
+            default: JSON.stringify(this.ignoreObj),
         },
     }
 
