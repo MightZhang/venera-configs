@@ -1190,6 +1190,9 @@ class Ehentai extends ComicSource {
                 if(res.status !== 200) {
                     throw `Invalid status code: ${res.status}`
                 }
+                if(res.body.indexOf('<a href="https://forums.e-hentai.org/index.php?act=Reg&amp;CODE=00" target="_n">Register</a>')){
+                    throw `Page Error: current page is login page, please login before downloadind from archives!`
+                }
                 let document = new HtmlDocument(res.body)
                 let body = document.querySelector("div#db")
                 let index = this.baseUrl.includes("exhentai") ? 1 : 3
