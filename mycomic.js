@@ -593,13 +593,13 @@ class MyComic extends ComicSource {
                     });
                 }
             }
-
+            const chaptersReversed = new Map([...chapters].reverse())
             return new ComicDetails({
                 title: title,
                 cover: cover,
                 description: description,
                 tags: tags,
-                chapters: chapters,
+                chapters: chaptersReversed,
                 thumbnails: [cover],
                 url: url,
                 uploader: author || undefined,

@@ -86,17 +86,26 @@ let showAiGenFlag = "";
             }
 
             // ... 原代码
-
-            const re = /[（(]AI[）)]/g;
+            const checkTitle =  (title)=>{
+                if(!title||title==='')return false;
+                const re = /[（(]AI[）)]|\[AI(?:\s*Generated)?\]/g
+                return title.match(re);
+            }
+            const checkTag =  (tags)=>{
+                if(!tags||!Array.isArray(tags)||tags.length==0)return false;
+                const aiTags = ['AI作畫','AI生成']
+                const set = new Set(tags);
+                return aiTags.some(item => set.has(item));
+            }
             data.data.comics.docs.forEach(c => {
                 let comic = this.parseComic(c);
                 if(showAiGenFlag===''){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='ai'&&(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                if(showAiGenFlag==='ai'&&(checkTitle(comic.tags)||checkTitle(comic.title))){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='noai'&&!(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                if(showAiGenFlag==='noai'&&!(checkTitle(comic.tags)||checkTitle(comic.title))){
                     comics.push(comic)
                 }
                 

@@ -438,7 +438,14 @@ class Ehentai extends ComicSource {
     category = {
         /// title of the category page, used to identify the page, it should be unique
         title: "ehentai",
-        parts: [],
+        parts: [ 
+            {
+                name: "标签",
+                type: "fixed",
+                categories: ["無修正","CG","AI作畫","misc", "doujinshi", "manga", "artist cg", "game cg", "image set", "cosplay", "asian porn", "non-h", "western"],
+                itemType: "search",
+            }
+        ],
         // enable ranking page
         enableRankingPage: true,
     }
@@ -797,8 +804,6 @@ class Ehentai extends ComicSource {
             comic.folder = folder
             comic.token = variables.get("token")
             this.apikey = variables.get("apikey")
-            console.warn("=======loadInfo=====comic.token==\n"+JSON.stringify(comic.token));
-            console.warn("=======loadInfo=====  this.apikey ==\n"+JSON.stringify(  this.apikey ));
 
             if(this.apikey[0] === '"') {
                 this.apikey = this.apikey.substring(1, this.apikey.length - 1)
@@ -806,7 +811,6 @@ class Ehentai extends ComicSource {
             this.uid = variables.get("apiuid")
 
             document.dispose()
-            console.warn("=======loadInfo=====comic===\n"+JSON.stringify(comic))
             return comic;
         },
         /**

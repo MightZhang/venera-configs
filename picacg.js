@@ -323,6 +323,17 @@ class Picacg extends ComicSource {
         ],
         enableRankingPage: true,
     }
+    checkAITitle = (title) => {
+        if (!title || title === '') return false;
+        const re = /[（(]AI[）)]|\[AI(?:\s*Generated)?\]/g
+        return title.match(re);
+    }
+    checkAITag = (tags) => {
+        if (!tags || !Array.isArray(tags) || tags.length == 0) return false;
+        const aiTags = ['AI作畫', 'AI生成']
+        const set = new Set(tags);
+        return aiTags.some(item => set.has(item));
+    }
     lastClickCategory=""
     /// 分类漫画页面, 即点击分类标签后进入的页面
     categoryComics = {
@@ -351,16 +362,15 @@ class Picacg extends ComicSource {
             }
             let data = JSON.parse(res.body)
             let comics = []
-            const re = /[（(]AI[）)]/g;
             data.data.comics.docs.forEach(c => {
                 let comic = this.parseComic(c);
                 if(showAiGenFlag===''){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='ai'&&(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                if(showAiGenFlag==='ai'&&(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='noai'&&!(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                if(showAiGenFlag==='noai'&&!(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
                 
@@ -497,16 +507,15 @@ class Picacg extends ComicSource {
             }
             let data = JSON.parse(res.body)
             let comics = []
-            const re = /[（(]AI[）)]/g;
             data.data.comics.docs.forEach(c => {
                 let comic = this.parseComic(c);
                 if(showAiGenFlag===''){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='ai'&&(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                if(showAiGenFlag==='ai'&&(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='noai'&&!(comic.tags.includes('AI作畫')||comic.title.match(re))){
+                if(showAiGenFlag==='noai'&&!(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
                 
