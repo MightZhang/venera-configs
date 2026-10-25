@@ -323,12 +323,12 @@ class Picacg extends ComicSource {
         ],
         enableRankingPage: true,
     }
-    checkAITitle = (title) => {
+    checkAITitle(title){
         if (!title || title === '') return false;
         const re = /[（(]AI[）)]|\[AI(?:\s*Generated)?\]/g
         return title.match(re);
     }
-    checkAITag = (tags) => {
+    checkAITags(tags){
         if (!tags || !Array.isArray(tags) || tags.length == 0) return false;
         const aiTags = ['AI作畫', 'AI生成']
         const set = new Set(tags);
@@ -367,10 +367,10 @@ class Picacg extends ComicSource {
                 if(showAiGenFlag===''){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='ai'&&(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
+                if(showAiGenFlag==='ai'&&(this.checkAITags(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='noai'&&!(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
+                if(showAiGenFlag==='noai'&&!(this.checkAITags(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
                 
@@ -512,10 +512,10 @@ class Picacg extends ComicSource {
                 if(showAiGenFlag===''){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='ai'&&(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
+                if(showAiGenFlag==='ai'&&(this.checkAITags(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='noai'&&!(this.checkAITitle(comic.tags)||this.checkAITitle(comic.title))){
+                if(showAiGenFlag==='noai'&&!(this.checkAITags(comic.tags)||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
                 
