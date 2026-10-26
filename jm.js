@@ -29,6 +29,7 @@ class JM extends ComicSource {
 
     ignoreObj =
 {
+"1244466": { "enable": true, "headf": 0, "endf": 1 },
 "286368": { "enable": true, "headf": 0, "endf": 1 },
 "569509": { "enable": true, "headf": 0, "endf": 1 },
 "1020473": { "enable": true, "headf": 0, "endf": 1 },
