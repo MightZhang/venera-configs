@@ -481,7 +481,18 @@ class Ehentai extends ComicSource {
             }
         }
     }
-
+    checkAITitle(title) {
+        if (!title || title === '') return false;
+        const re = /[（(]AI[）)]|\[AI(?:\s*Generated)?\]/g
+        return title.match(re);
+    }
+    checkAITags(tags) {
+        if (!tags || !Array.isArray(tags) || tags.length == 0) return false;
+        const aiTags = ['AI作畫', 'AI生成']
+        const set = new Set(tags);
+        return aiTags.some(item => set.has(item));
+    }
+    lastClickCategory="" // 全局变量，保存上次搜索的关键字
     /// search related
     search = {
         /**
@@ -569,6 +580,17 @@ class Ehentai extends ComicSource {
                 ],
                 // option label
                 label: "Language",
+            },
+            {
+                // type: select, multi-select, dropdown
+                type: "select",
+                options: [
+                    "all-All",
+                    "ai-AI Generate",
+                    "noai-None AI Generate",
+                ],
+                // option label
+                label: "AI Filter",
             },
         ],
 
@@ -1514,6 +1536,8 @@ class Ehentai extends ComicSource {
             "H@H 2560x": "H@H 2560x",
             "Original": "原版",
             "Resample": "重采样",
+            "AI Generate": "AI作画",
+            "None AI Generate": "非AI作画",
         },
         'zh_TW': {
             'domain': '域名',
@@ -1551,6 +1575,8 @@ class Ehentai extends ComicSource {
             "H@H 2560x": "H@H 2560x",
             "Original": "原版",
             "Resample": "重採樣",
+            "AI Generate": "AI作画",
+            "None AI Generate": "非AI作画",
         },
         'en_US': {
             "domain": "Domain",
@@ -1587,7 +1613,9 @@ class Ehentai extends ComicSource {
             "H@H 1920x": "H@H 1920x",
             "H@H 2560x": "H@H 2560x",
             "Original": "Original",
-            "Resample": "Resample"
+            "Resample": "Resample",
+            "AI Generate": "AI Generate",
+            "None AI Generate": "None AI",
         },
     }
 }

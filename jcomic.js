@@ -221,6 +221,7 @@ class JComic extends ComicSource {
           "最近更新",
           "隨機",
           "全彩",
+          "無修正",
           "長篇",
           "單行本",
           "同人",
@@ -260,7 +261,19 @@ class JComic extends ComicSource {
     ],
     enableRankingPage: false,
   };
-
+  checkAITitle(title) {
+    if (!title || title === '') return false;
+    const re = /[（(]AI[）)]|\[AI(?:\s*Generated)?\]/g
+    return title.match(re);
+  }
+  checkAITags(tags) {
+    if (!tags || !Array.isArray(tags) || tags.length == 0) return false;
+    const aiTags = ['AI作畫', 'AI生成']
+    const set = new Set(tags);
+    return aiTags.some(item => set.has(item));
+  }
+  lastClickCategory="" // 全局变量，保存上次搜索的关键字
+  
   categoryComics = {
     /**
      * @param category {string}
@@ -269,6 +282,14 @@ class JComic extends ComicSource {
      * @param page {number}
      */
     load: async (category, param, options, page) => {
+      let showAiGenFlag = "";
+      if (options[0] === 'ai' || options[0] === 'noai') {
+        showAiGenFlag = options[0];
+        options[0] = this.lastClickCategory
+      } else {
+        this.lastClickCategory = options[0];
+      }
+
       if (!page) page = 1;
       const encoded = encodeURI(param);
       const path = page === 1 ? `/cat/${encoded}` : `/cat/${encoded}/${page}`;
@@ -278,15 +299,44 @@ class JComic extends ComicSource {
       if (resp.status !== 200) throw new Error(resp.status);
 
       const doc = new HtmlDocument(resp.body);
-      const comics = parseComicList(doc);
+      const comicsSource = parseComicList(doc);
       const maxPage = parseMaxPage(doc);
+      let comics = []
+      comicsSource.forEach(comic => {
+        if (showAiGenFlag === '') {
+          comics.push(comic)
+        }
+        if (showAiGenFlag === 'ai' && (this.checkAITags(comic.tags) || this.checkAITitle(comic.title))) {
+          comics.push(comic)
+        }
+        if (showAiGenFlag === 'noai' && !(this.checkAITags(comic.tags) || this.checkAITitle(comic.title))) {
+          comics.push(comic)
+        }
 
+      })
       return { comics, maxPage };
     },
-    optionList: [],
+    optionList: [
+      {
+        options: [
+          "all-All",
+          "ai-AI Generate",
+          "noai-None AI Generate",
+        ]
+      }
+    ],
     ranking: null,
   };
-
+  translation = {
+    'zh_CN': {
+      "AI Generate": "AI作画",
+      "None AI Generate": "非AI作画",
+    },
+    'zh_TW': {
+      "AI Generate": "AI作画",
+      "None AI Generate": "非AI作画",
+    },
+  }
   /// 搜索
   search = {
     /**
