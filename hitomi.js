@@ -1004,7 +1004,13 @@ class Hitomi extends ComicSource {
 
   galleryCache = [];
   imagesCache = [];
-
+  settings = {
+      'enableUseWebp':{
+            title: "加载webp格式",
+            type: "switch",
+            default: false
+        }
+      };
   categoryResultCache = undefined;
   searchResultCaches = new Map();
 
@@ -1478,7 +1484,7 @@ class Hitomi extends ComicSource {
 
       this.galleryCache = data;
       let images = await get_image_srcs(data.files);
-      if (false) {
+      if (this.loadSetting('enableUseWebp')) {
         images = images.map(url => {
           // ★ 核心：AVIF URL → WebP URL
           if (url.includes('.avif')) {
