@@ -413,25 +413,25 @@ class Ehentai extends ComicSource {
                 return this.getGalleries(next ?? `${this.baseUrl}/popular`, false);
             }
         },
-        {
-            // title of the page.
-            // title is used to identify the page, it should be unique
-            title: "eh watched",
+        // {
+        //     // title of the page.
+        //     // title is used to identify the page, it should be unique
+        //     title: "eh watched",
 
-            /// multiPartPage or multiPageComicList or mixed
-            type: "multiPageComicList",
+        //     /// multiPartPage or multiPageComicList or mixed
+        //     type: "multiPageComicList",
 
-            loadNext: async (next) => {
-                if (!this.isLogged) {
-                    UI.showMessage("Need login first");
-                    return {
-                        comics: [],
-                        next: null
-                    };
-                }
-                return this.getGalleries(next ?? `${this.baseUrl}/watched`, false);
-            }
-        },
+        //     loadNext: async (next) => {
+        //         if (!this.isLogged) {
+        //             UI.showMessage("Need login first");
+        //             return {
+        //                 comics: [],
+        //                 next: null
+        //             };
+        //         }
+        //         return this.getGalleries(next ?? `${this.baseUrl}/watched`, false);
+        //     }
+        // },
     ]
 
     // categories
