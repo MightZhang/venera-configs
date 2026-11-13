@@ -434,7 +434,7 @@ class Ehentai extends ComicSource {
         // },
     ]
 
-    // categories
+    // categories [Misaya] 初音coser双穴性爱，屁眼拉大葱 realistic AI animated EP34+35 (40P) [AI Generated]
     category = {
         /// title of the category page, used to identify the page, it should be unique
         title: "ehentai",
@@ -442,7 +442,13 @@ class Ehentai extends ComicSource {
             {
                 name: "标签",
                 type: "fixed",
-                categories: ["無修正","CG","AI作畫","misc", "doujinshi", "manga", "artist cg", "game cg", "image set", "cosplay", "asian porn", "non-h", "western"],
+                categories: [
+                    "AI animated",
+                    "uploader:sdsa123",
+                    "無修正",
+                    "CG",
+                    "AI作畫",
+                    "misc", "doujinshi", "manga", "artist cg", "game cg", "image set", "cosplay", "asian porn", "non-h", "western"],
                 itemType: "search",
             }
         ],
