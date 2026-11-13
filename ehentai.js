@@ -443,6 +443,7 @@ class Ehentai extends ComicSource {
                 name: "标签",
                 type: "fixed",
                 categories: [
+                    "other:animated",
                     "AI animated",
                     "uploader:sdsa123",
                     "無修正",
