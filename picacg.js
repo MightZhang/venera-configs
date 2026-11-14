@@ -367,10 +367,10 @@ class Picacg extends ComicSource {
                 if(showAiGenFlag===''){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='ai'&&(this.checkAITags(comic.tags)||this.checkAITitle(comic.title))){
+                if(showAiGenFlag==='ai'&&(this.checkAITags([c.author,...comic.tags])||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
-                if(showAiGenFlag==='noai'&&!(this.checkAITags(comic.tags)||this.checkAITitle(comic.title))){
+                if(showAiGenFlag==='noai'&&!(this.checkAITags([c.author,...comic.tags])||this.checkAITitle(comic.title))){
                     comics.push(comic)
                 }
                 
