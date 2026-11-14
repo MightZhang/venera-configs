@@ -330,7 +330,7 @@ class Picacg extends ComicSource {
     }
     checkAITags(tags){
         if (!tags || !Array.isArray(tags) || tags.length == 0) return false;
-        const aiTags = ['AI作畫', 'AI生成']
+        const aiTags = ['AI作畫', 'AI生成','AI Generated']
         const set = new Set(tags);
         return aiTags.some(item => set.has(item));
     }
